@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Family Travel</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="apple-mobile-web-app-title" content="Family Travel"/>
+<meta name="theme-color" content="#ffffff"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg:#f5f5f5;--white:#fff;--text:#111;--muted:#888;
+  --border:#e5e5e5;--card:#efefef;--pill:#3a3a3a;--pt:#fff;
+  --red:#e84040;--green:#22c55e;--r:14px;
+  --font:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{font-family:var(--font);background:var(--bg);color:var(--text);height:100%;overflow:hidden}
+input,select,textarea,button{font-family:var(--font)}
+#app{max-width:480px;margin:0 auto;height:100vh;display:flex;flex-direction:column;background:var(--bg)}
+.hdr{background:var(--white);padding:12px 16px 0;flex-shrink:0;box-shadow:0 1px 0 var(--border);z-index:10}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.hdr-title{font-size:21px;font-weight:600}
+.hdr-acts{display:flex;align-items:center;gap:7px}
+.btn-ic{background:var(--card);border:none;border-radius:8px;padding:7px 10px;cursor:pointer;display:flex;align-items:center;color:var(--text)}
+.btn-ic:active{opacity:.6}
+.btn-rnd{background:var(--pill);color:var(--pt);border:none;border-radius:99px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.btn-rnd:active{opacity:.7}
+.sync{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
+.sync span{width:7px;height:7px;border-radius:50%;display:inline-block}
+.sbar{display:flex;align-items:center;gap:9px;background:var(--card);border-radius:11px;padding:9px 13px;margin-bottom:2px}
+.sbar input{background:none;border:none;outline:none;font-size:15px;color:var(--text);flex:1}
+.pp{padding:7px 0 3px}
+.pp-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px}
+.pp-bar{background:var(--border);border-radius:99px;height:5px;overflow:hidden}
+.pp-fill{background:var(--pill);height:100%;border-radius:99px;transition:width .4f}
+.owf{display:flex;gap:6px;overflow-x:auto;padding:6px 0 8px;scrollbar-width:none}
+.owf::-webkit-scrollbar{display:none}
+.owp{background:var(--card);border:1.5px solid transparent;border-radius:99px;padding:5px 13px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.owp.on{background:var(--pill);color:var(--pt);border-color:var(--pill)}
+.tabs{display:flex;margin-top:6px}
+.tab{flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px 11px;border-bottom:2px solid transparent;color:var(--muted);font-size:10px;font-weight:400;transition:color .15s,border-color .15s}
+.tab.on{color:var(--text);border-bottom-color:var(--text);font-weight:700}
+.body{flex:1;overflow-y:auto;padding:14px 14px 30px;-webkit-overflow-scrolling:touch}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dc{background:var(--card);border-radius:var(--r);padding:13px;cursor:pointer;position:relative}
+.dc:active{opacity:.7}
+.dc-day{font-size:15px;font-weight:600;padding-right:44px;line-height:1.3;color:#0047AB}
+.dc-date{font-size:12px;color:var(--muted);margin-top:2px}
+.dc-place{font-size:12px;color:var(--text);margin-top:6px;font-weight:500;line-height:1.4}
+.acts{position:absolute;top:8px;right:8px;display:flex;gap:3px}
+.acts button{background:rgba(0,0,0,.07);border:none;border-radius:6px;padding:3px 6px;cursor:pointer;line-height:1}
+.acts button:active{opacity:.6}
+.lc{background:var(--white);border-radius:var(--r);padding:13px 15px;margin-bottom:9px;box-shadow:0 1px 4px rgba(0,0,0,.06);cursor:pointer;position:relative}
+.lc:active{opacity:.8}
+.lc-t{font-size:15px;font-weight:600;padding-right:60px}
+.lc-s{font-size:12px;color:var(--muted);margin-top:3px}
+.lc-n{font-size:12px;color:var(--text);margin-top:5px;line-height:1.4}
+.pi{background:var(--white);border-radius:var(--r);padding:11px 14px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;align-items:center;gap:11px}
+.pck{background:none;border:none;cursor:pointer;line-height:1;padding:0;flex-shrink:0}
+.pi-lbl{font-size:14px;font-weight:600}
+.pi-lbl.done{text-decoration:line-through;color:var(--muted)}
+.pi-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.st{text-align:center;padding-top:60px;color:var(--muted)}
+.st .ic{margin-bottom:12px}
+.st p{font-size:14px;line-height:1.6}
+.err-msg{font-size:13px;color:var(--red);margin-top:8px}
+.btn-retry{background:var(--pill);color:var(--pt);border:none;border-radius:10px;padding:10px 22px;font-size:14px;cursor:pointer;margin-top:12px}
+#det{display:none;position:fixed;inset:0;background:var(--white);z-index:50;overflow-y:auto;max-width:480px;margin:0 auto;-webkit-overflow-scrolling:touch}
+#det.on{display:block}
+.det-in{padding:16px 20px 50px}
+.back{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;color:var(--text);font-size:15px;padding:0;margin-bottom:20px}
+.back:active{opacity:.6}
+.det-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.det-ttl{font-size:25px;font-weight:700;line-height:1.25}
+.det-sub{font-size:14px;color:var(--muted);margin-top:5px}
+.btn-edit{background:var(--pill);color:var(--pt);border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;flex-shrink:0}
+.det-rows{margin-top:22px}
+.dr{display:flex;border-bottom:1px solid var(--border);padding:13px 0;gap:14px;align-items:flex-start}
+.dr .l{font-size:14px;color:var(--muted);width:130px;flex-shrink:0}
+.dr .v{font-size:14px;color:var(--text);flex:1;line-height:1.6;text-align:left;white-space:pre-wrap;word-break:break-word}
+#frm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:flex-end;justify-content:center}
+#frm.on{display:flex}
+.fs{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column}
+.fh{display:flex;justify-content:center;padding:12px 0 4px}
+.fh span{width:36px;height:4px;border-radius:99px;background:var(--border)}
+.fhdr{display:flex;justify-content:space-between;align-items:center;padding:10px 20px 14px}
+.fhdr-t{font-size:17px;font-weight:700}
+.fcls{background:var(--card);border:none;border-radius:99px;width:30px;height:30px;cursor:pointer;font-size:16px;color:var(--muted);display:flex;align-items:center;justify-content:center}
+.fb{overflow-y:auto;padding:0 20px;flex:1}
+.ff{margin-bottom:14px}
+.fl{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.7px;text-transform:uppercase;display:block;margin-bottom:5px}
+.fi{width:100%;background:#f0f0f0;border:1px solid #e0e0e0;border-radius:10px;padding:11px 13px;font-size:15px;color:var(--text);outline:none}
+.fi:focus{border-color:#bbb}
+textarea.fi{resize:vertical;line-height:1.5;min-height:80px}
+select.fi{appearance:none}
+.fck{display:flex;align-items:center;gap:12px;cursor:pointer;margin-top:4px}
+.fck input{width:22px;height:22px;accent-color:var(--pill);cursor:pointer}
+.fft{padding:14px 20px 36px}
+.fsave{width:100%;padding:14px;background:var(--pill);color:var(--pt);border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer}
+.fsave:active{opacity:.8}
+#toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--pill);color:var(--pt);border-radius:99px;padding:10px 22px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.18);z-index:200;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.on{opacity:1}
+#stt{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150;align-items:flex-end;justify-content:center}
+#stt.on{display:flex}
+.stp{background:var(--white);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:90vh;display:flex;flex-direction:column}
+.stb{overflow-y:auto;padding:0 20px;flex:1}
+.st-sec{margin-bottom:22px}
+.st-sec-t{font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:block}
+.st-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.st-row input{flex:1;background:#f0f0f0;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-size:14px;color:var(--text);outline:none;font-family:var(--font)}
+.st-row input:focus{border-color:#bbb}
+.st-del{background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;line-height:1;border-radius:6px}
+.st-del:active{opacity:.6}
+.st-add{background:var(--card);border:none;border-radius:10px;padding:9px 14px;font-size:13px;color:var(--text);cursor:pointer;font-family:var(--font);margin-top:2px}
+.st-add:active{opacity:.7}
+.op50{opacity:.5}
+.sec-hdr{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 2px 6px}
+
+/* ── Trip Selector ── */
+#trip-sel{display:none;position:fixed;inset:0;background:var(--bg);z-index:200;overflow-y:auto;max-width:480px;margin:0 auto}
+#trip-sel.on{display:block}
+.ts-wrap{padding:24px 20px 50px}
+.ts-hdr{font-size:26px;font-weight:700;margin-bottom:4px}
+.ts-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+.ts-card{background:var(--white);border-radius:16px;padding:18px 18px;margin-bottom:12px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;align-items:center;gap:14px;border:2px solid transparent;transition:border-color .15s}
+.ts-card:active{opacity:.7}
+.ts-card.active-trip{border-color:var(--pill)}
+.ts-card-ico{width:44px;height:44px;border-radius:12px;background:var(--card);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ts-card-body{flex:1;min-width:0}
+.ts-card-name{font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ts-card-dates{font-size:12px;color:var(--muted);margin-top:2px}
+.ts-card-badge{font-size:11px;font-weight:700;background:var(--pill);color:var(--pt);border-radius:99px;padding:3px 9px;flex-shrink:0}
+.ts-add{width:100%;padding:14px;background:var(--card);color:var(--text);border:2px dashed var(--border);border-radius:16px;font-size:15px;font-weight:600;cursor:pointer;margin-top:6px}
+.ts-add:active{opacity:.7}
+
+/* Trip indicator pill in header */
+.trip-pill{display:inline-flex;align-items:center;gap:5px;background:var(--card);border-radius:99px;padding:5px 11px 5px 8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--text);border:none;max-width:160px;overflow:hidden}
+.trip-pill:active{opacity:.7}
+.trip-pill span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── Import Modal ── */
+#import-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;align-items:flex-end;justify-content:center}
+#import-modal.on{display:flex}
+.im-sheet{background:var(--white);border-radius:22px 22px 0 0;padding:24px 22px 40px;width:100%;max-width:480px}
+.im-handle{width:36px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 18px}
+.im-title{font-size:16px;font-weight:700;margin-bottom:6px}
+.im-sub{font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.5}
+.im-cols{list-style:none;margin-bottom:22px}
+.im-cols li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:14px}
+.im-cols li:last-child{border-bottom:none}
+.im-col-dot{width:7px;height:7px;border-radius:50%;background:var(--pill);flex-shrink:0}
+.im-col-name{font-weight:600;min-width:120px}
+.im-col-desc{color:var(--muted);font-size:12px}
+.im-btns{display:flex;gap:10px}
+.im-btn-cancel{flex:1;padding:13px;background:var(--card);border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;color:var(--text)}
+.im-btn-go{flex:2;padding:13px;background:var(--pill);color:var(--pt);border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer}
+.im-btn-cancel:active,.im-btn-go:active{opacity:.7}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div class="hdr-title" id="hdr-t">Itinerary</div>
+        <button class="trip-pill" id="trip-pill-btn" onclick="openTripSelector()" style="display:none">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="trip-pill-name">Select trip</span>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <div class="hdr-acts">
+        <div class="sync"><span id="sdot" style="background:#ccc"></span><span id="slbl">Loading…</span></div>
+        <button class="btn-ic" onclick="loadTab()" title="Refresh">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+        <button class="btn-ic" onclick="triggerImport()" title="Import Excel">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <input type="file" id="fi" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleImport(event)"/>
+        <button class="btn-ic" id="settbtn" onclick="openSettings()" title="Settings">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button class="btn-rnd" onclick="openAdd()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="sbar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" id="si" placeholder="Search" oninput="render()"/>
+    </div>
+    <div id="pp" class="pp" style="display:none">
+      <div class="pp-row"><span>Packed</span><span id="pc">0/0</span></div>
+      <div class="pp-bar"><div class="pp-fill" id="pf" style="width:0%"></div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab" id="tp" onclick="switchTab('packing_list')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Packing
+      </button>
+      <button class="tab" id="ta" onclick="switchTab('stay')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9v11"/><path d="M21 9v11"/><path d="M3 13h18"/><path d="M3 9a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4"/><path d="M9 13v-2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Stays
+      </button>
+      <button class="tab on" id="ti" onclick="switchTab('itinerary')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Itinerary
+      </button>
+      <button class="tab" id="tsh" onclick="switchTab('shopping_list')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Shopping
+      </button>
+    </div>
+  </div>
+
+  <div class="body" id="body">
+    <div class="st"><div class="ic"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div><p>Loading…</p></div>
+  </div>
+
+  <div id="det">
+    <div class="det-in">
+      <button class="back" onclick="closeDet()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="15 18 9 12 15 6"/></svg>Back
+      </button>
+      <div class="det-hdr">
+        <div><div class="det-ttl" id="dt"></div><div class="det-sub" id="ds"></div></div>
+        <button class="btn-edit" onclick="editFromDet()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit
+        </button>
+      </div>
+      <div class="det-rows" id="dr"></div>
+    </div>
+  </div>
+
+  <div id="frm" onclick="bgClose(event)">
+    <div class="fs">
+      <div class="fh"><span></span></div>
+      <div class="fhdr"><div class="fhdr-t" id="ft"></div><button class="fcls" onclick="closeForm()">✕</button></div>
+      <div class="fb" id="fb"></div>
+      <div class="fft"><button class="fsave" onclick="submitForm()">Save</button></div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <!-- Trip Selector -->
+  <div id="trip-sel">
+    <div class="ts-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div class="ts-hdr" style="margin-bottom:0">Happy Holidays</div>
+        <button onclick="openSettings()" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--muted)" title="Settings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+      <div class="ts-sub">Select a trip to view its details, or create a new one.</div>
+      <div id="ts-list"><div class="st"><p style="font-size:14px;color:var(--muted)">Loading trips…</p></div></div>
+      <div id="ts-unlock-row" style="margin-bottom:10px;display:none">
+        <button id="unlock-btn" class="ts-add" style="border-style:solid;border-color:var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;gap:7px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Unlock private trips
+        </button>
+      </div>
+      <button class="ts-add" onclick="openAddTrip()">+ New Trip</button>
+    </div>
+  </div>
+
+  <!-- Add/Edit Trip Form -->
+  <div id="trip-frm" onclick="bgCloseTripFrm(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:flex-end;justify-content:center">
+    <div class="fs">
+      <div class="fh"><span></span></div>
+      <div class="fhdr"><div class="fhdr-t" id="tft">New Trip</div><button class="fcls" onclick="closeTripFrm()">✕</button></div>
+      <div class="fb" id="tfb"></div>
+      <div class="fft" id="trip-fft"><button class="fsave" onclick="submitTripMeta(false)">Save</button></div>
+    </div>
+  </div>
+
+  <div id="stt" onclick="bgCloseSettings(event)">
+    <div class="stp">
+      <div class="fh"><span></span></div>
+      <div class="fhdr"><div class="fhdr-t">Settings</div><button class="fcls" onclick="closeSettings()">✕</button></div>
+      <div class="stb" id="stb"></div>
+      <div class="fft" style="display:flex;gap:10px"><button onclick="resetSettings()" style="flex:1;padding:13px;background:var(--card);border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;color:var(--red)">Reset defaults</button><button class="fsave" style="flex:2" onclick="saveSettings()">Save</button></div>
+    </div>
+  </div>
+
+  <!-- Passcode Modal -->
+  <div id="passcode-modal" onclick="bgClosePasscodeModal(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center">
+    <div style="background:var(--white);border-radius:20px;padding:24px 22px;width:88%;max-width:340px">
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">🔒 Private Trip</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px">Enter the passcode to access this trip.</div>
+      <input class="fi" type="password" id="passcode-entry" placeholder="Passcode…" autocomplete="off" style="margin-bottom:12px"/>
+      <div id="passcode-error" style="font-size:12px;color:var(--red);margin-bottom:10px;display:none">Incorrect passcode. Try again.</div>
+      <div style="display:flex;gap:10px">
+        <button onclick="closePasscodeModal()" style="flex:1;padding:12px;background:var(--card);border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer">Cancel</button>
+        <button onclick="submitPasscode()" style="flex:2;padding:12px;background:var(--pill);color:var(--pt);border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer">Unlock</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div id="import-modal" onclick="bgCloseImportModal(event)">
+    <div class="im-sheet">
+      <div class="im-handle"></div>
+      <div class="im-title" id="im-title">Import Data</div>
+      <div class="im-sub" id="im-sub"></div>
+      <ul class="im-cols" id="im-col-list"></ul>
+      <div class="im-btns">
+        <button class="im-btn-cancel" onclick="closeImportModal()">Cancel</button>
+        <button class="im-btn-go" onclick="confirmImport()">Continue to Import</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Supabase ──────────────────────────────────────────────────────────────────
+const SB_URL = 'https://fpzrivavbtentaqbvpuj.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwenJpdmF2YnRlbnRhcWJ2cHVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTYyMTUsImV4cCI6MjA4ODc3MjIxNX0.7ic5Zvpuwhsk4-bjRRlUcSDvtXdAGk8n7Nqw5s39o_s';
+
+const H = {
+  'Content-Type':  'application/json',
+  'apikey':        SB_KEY,
+  'Authorization': 'Bearer ' + SB_KEY,
+  'Prefer':        'return=representation'
+};
+
+async function sbGet(table, order, tripId) {
+  let url = `${SB_URL}/rest/v1/${table}?select=*&order=${order}`;
+  // Fetch rows for this trip OR rows with no trip assigned (legacy data)
+  if (tripId) url += `&or=(trip_id.eq.${tripId},trip_id.is.null)`;
+  const r = await fetch(url, { headers: H });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// Bulk-assign unlinked rows to a trip
+async function sbAssignTripId(table, tripId) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?trip_id=is.null`, {
+    method: 'PATCH', headers: H, body: JSON.stringify({ trip_id: tripId })
+  });
+  if (!r.ok) throw new Error(await r.text());
+}
+async function sbGetTrips() {
+  const r = await fetch(`${SB_URL}/rest/v1/trips?select=*&order=created_at.desc`, { headers: H });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbInsert(table, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}`, { method:'POST', headers: H, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbUpdate(table, id, body) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}`, { method:'PATCH', headers: H, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbDelete(table, id) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?id=eq.${id}`, { method:'DELETE', headers: { ...H, Prefer:'return=minimal' } });
+  if (!r.ok) throw new Error(await r.text());
+}
+async function sbGetWhere(table, query) {
+  const r = await fetch(`${SB_URL}/rest/v1/${table}?select=*&${query}`, { headers: H });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// ── Config ────────────────────────────────────────────────────────────────────
+const TAB_CFG = {
+  itinerary:     { table:'itinerary',     order:'day_number.asc,id.asc' },
+  stay:          { table:'stay',          order:'check_in_date.asc,id.asc' },
+  packing_list:  { table:'packing_list',  order:'category.asc,id.asc' },
+  transport:     { table:'transport',     order:'travel_date.asc,dep_time.asc,id.asc' },
+  shopping_list: { table:'shopping_list', order:'is_purchased.asc,id.asc' },
+};
+const TAB_LABELS  = { itinerary:'Itinerary', stay:'Stays', packing_list:'Packing List', shopping_list:'Shopping List' };
+const FORM_LABELS = { itinerary:'Day', stay:'Stay', packing_list:'Packing Item', shopping_list:'Shopping Item' };
+const TAB_IDS     = { itinerary:'ti', stay:'ta', packing_list:'tp', shopping_list:'tsh' };
+
+// Exact Supabase column names per table
+const FIELDS = {
+  itinerary: [
+    { k:'day_number',    l:'Day Number',    t:'number' },
+    { k:'date_label',    l:'Date',          t:'text'   },
+    { k:'place_area',    l:'Place / Area',  t:'text'   },
+    { k:'activities',    l:'Activities',    t:'ta'     },
+    { k:'opening_hours', l:'Opening Hours', t:'text'   },
+    { k:'best_time',     l:'Best Time',     t:'text'   },
+    { k:'commute',       l:'Commute',       t:'ta'     },
+    { k:'notes',         l:'Notes',         t:'ta'     },
+  ],
+  stay: [
+    { k:'hotel_name',      l:'Hotel Name',       t:'text'   },
+    { k:'check_in_date',   l:'Check-in Date',    t:'date'   },
+    { k:'check_out_date',  l:'Check-out Date',   t:'date'   },
+    { k:'no_of_nights',    l:'No. of Nights',    t:'number' },
+    { k:'address',         l:'Address',          t:'ta'     },
+    { k:'confirmation_no', l:'Confirmation No.', t:'text'   },
+    { k:'notes',           l:'Notes',            t:'ta'     },
+  ],
+  packing_list: [
+    { k:'notes',     l:'Item Name', t:'text' },
+    { k:'category',  l:'Category',  t:'sel', o:['Clothing','Toiletries','Documents','Electronics','Kids','Snacks','Medical','Other'] },
+    { k:'owner',     l:'Who',       t:'sel', o:['Everyone','Traveller 1','Traveller 2','Traveller 3','Shared'] },
+    { k:'quantity',  l:'Quantity',  t:'text' },
+    { k:'is_packed', l:'Packed?',   t:'chk'  },
+  ],
+  shopping_list: [
+    { k:'product',        l:'Product',          t:'text'   },
+    { k:'quantity',       l:'Quantity',         t:'text'   },
+    { k:'who_for',        l:'Who For',          t:'text'   },
+    { k:'where_to_buy',   l:'Where to Buy',     t:'text'   },
+    { k:'price_home',     l:'Price (Home)',      t:'price', cur:'currency_home',  defcur:'SGD' },
+    { k:'price_local',    l:'Price (Local)',     t:'price', cur:'currency_local', defcur:''    },
+    { k:'price_converted', l:'Converted (SGD)',   t:'price', cur:'currency_converted', defcur:'SGD' },
+    { k:'is_purchased',   l:'Purchased?',       t:'chk'    },
+    { k:'notes',          l:'Notes',            t:'ta'     },
+  ],
+  transport: [
+    { k:'travel_date', l:'Travel Date',        t:'date' },
+    { k:'flight_no',   l:'Flight / Rail No.',  t:'text' },
+    { k:'dep_city',    l:'From',               t:'text' },
+    { k:'arr_city',    l:'To',                 t:'text' },
+    { k:'dep_time',    l:'Departure Time',     t:'text' },
+    { k:'arr_time',    l:'Arrival Time',       t:'text' },
+    { k:'notes',       l:'Notes',              t:'ta'   },
+  ],
+};
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let rows = [];
+let CT   = 'itinerary';
+let DI   = null;
+let FI   = null;
+let OWNER_FILTER = 'Show All';
+let FORM_MODE = 'main';
+let itineraryTrips = [];
+let TRIP_EDIT = null;
+let CURRENT_TRIP_ID = localStorage.getItem('currentTripId') || null;
+let allTrips = [];
+
+// ── Sync indicator ────────────────────────────────────────────────────────────
+function ss(s) {
+  const dot = document.getElementById('sdot'), lbl = document.getElementById('slbl');
+  const colors = { ok:'var(--green)', saving:'#f59e0b', error:'var(--red)', loading:'#ccc' };
+  const labels = { ok:'Live', saving:'Saving…', error:'Error', loading:'Loading…' };
+  dot.style.background = colors[s] || '#ccc';
+  lbl.textContent = labels[s] || '…';
+}
+
+// ── Load ──────────────────────────────────────────────────────────────────────
+async function loadTab() {
+  if (!CURRENT_TRIP_ID) { openTripSelector(); return; }
+  ss('loading');
+  document.getElementById('si').value = '';
+
+  const cacheKey = `cache_${CT}_${CURRENT_TRIP_ID}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    try { rows = JSON.parse(cached); ss('ok'); render(); } catch(_) {}
+  }
+
+  try {
+    const cfg = TAB_CFG[CT];
+    const fetched = await sbGet(cfg.table, cfg.order, CURRENT_TRIP_ID);
+    rows = fetched || [];
+    try { localStorage.setItem(cacheKey, JSON.stringify(rows)); } catch(_) {}
+    ss('ok');
+    render();
+  } catch(e) {
+    if (!cached) {
+      rows = [];
+      ss('error');
+      document.getElementById('body').innerHTML = `
+        <div class="st">
+          <div class="ic"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <p>Could not load data</p>
+          <button class="btn-retry" onclick="loadTab()">Try Again</button>
+        </div>`;
+    }
+  }
+}
+
+function switchTab(t) {
+  if (!TAB_CFG[t] || !TAB_IDS[t]) return;
+  CT = t;
+  OWNER_FILTER = 'Show All';
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById(TAB_IDS[t]).classList.add('on');
+  document.getElementById('hdr-t').textContent = TAB_LABELS[t];
+  // Settings button always visible (contains global admin passcode)
+  loadTab();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderOwnerPills() {
+  const owners = ['Show All', ...getOwners()];
+  return `<div class="owf" style="margin-bottom:12px">${owners.map(o =>
+    `<button class="owp${OWNER_FILTER===o?' on':''}" onclick="setOwnerFilter('${o.replace(/'/g,"\'")}')">${esc(o)}</button>`
+  ).join('')}</div>`;
+}
+function setOwnerFilter(o) {
+  OWNER_FILTER = o;
+  renderOwnerPills();
+  render();
+}
+
+function unassignedBanner() {
+  const unlinked = rows.filter(r => !r.trip_id);
+  if (!unlinked.length || !CURRENT_TRIP_ID) return '';
+  return `<div style="background:#fffbe6;border:1px solid #f59e0b;border-radius:12px;padding:11px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span style="font-size:13px;flex:1">${unlinked.length} unassigned item${unlinked.length>1?'s':''} found. Link to this trip?</span>
+    <button onclick="assignUnlinked()" style="background:#f59e0b;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer">Assign all</button>
+  </div>`;
+}
+
+async function assignUnlinked() {
+  ss('saving');
+  try {
+    const tables = ['itinerary','stay','packing_list','transport','shopping_list'];
+    for (const t of tables) await sbAssignTripId(t, CURRENT_TRIP_ID);
+    toast('All items linked to this trip');
+    await loadTab();
+  } catch(e) { ss('error'); toast('Error: ' + e.message); }
+}
+
+function render() {
+  const el = document.getElementById('body');
+  const q  = document.getElementById('si').value.toLowerCase().trim();
+  const pp = document.getElementById('pp');
+
+  if (CT === 'packing_list' && rows.length) {
+    const done = rows.filter(x => x.is_packed).length;
+    document.getElementById('pc').textContent = `${done} / ${rows.length}`;
+    document.getElementById('pf').style.width = `${(done/rows.length)*100}%`;
+    pp.style.display = 'block';
+  } else { pp.style.display = 'none'; }
+
+  if      (CT === 'itinerary')      renderItin(el, q);
+  else if (CT === 'stay')           renderStay(el, q);
+  else if (CT === 'packing_list')   renderPack(el, q);
+  else if (CT === 'shopping_list')  renderShop(el, q);
+  else                              renderTrans(el, q);
+}
+
+const EICO = {
+  itinerary:    `<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+  stay:         `<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M3 9v11"/><path d="M21 9v11"/><path d="M3 13h18"/><path d="M3 9a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4"/><path d="M9 13v-2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`,
+  packing_list: `<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
+  transport:     `<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
+  shopping_list: `<svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
+};
+
+function empty(q) {
+  const msgs = { itinerary:'No days yet — tap + to add or import Excel', stay:'No stays yet — tap + to add', packing_list:'Nothing to pack yet — tap +', transport:'No transport yet — tap + to add', shopping_list:'No items yet — tap + to add' };
+  return `<div class="st"><div class="ic">${EICO[CT]}</div><p>${q ? 'No results found' : msgs[CT]}</p></div>`;
+}
+
+const SVG_EDIT = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+const SVG_DEL  = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
+
+function actBtns(id) {
+  return `<div class="acts">
+    <button onclick="event.stopPropagation();openEdit(${id})">${SVG_EDIT}</button>
+    <button onclick="event.stopPropagation();delItem(${id})">${SVG_DEL}</button>
+  </div>`;
+}
+
+function renderItin(el, q) {
+  let items = rows;
+  if (q) items = items.filter(d => [d.day_number, d.date_label, d.place_area, d.activities].join(' ').toLowerCase().includes(q));
+  if (!items.length) { el.innerHTML = unassignedBanner() + empty(q); return; }
+  el.innerHTML = unassignedBanner() + `<div class="grid">${items.map(d => `
+    <div class="dc" onclick="openDet(${d.id})">
+      ${actBtns(d.id)}
+      <div class="dc-day">Day ${esc(d.day_number)}</div>
+      <div class="dc-date">${esc(d.date_label)}</div>
+      ${d.place_area ? `<div class="dc-place">${esc(d.place_area)}</div>` : ''}
+    </div>`).join('')}</div>`;
+}
+
+function renderStay(el, q) {
+  let items = rows;
+  if (q) items = items.filter(a => [a.hotel_name, a.address, a.confirmation_no].join(' ').toLowerCase().includes(q));
+  if (!items.length) { el.innerHTML = unassignedBanner() + empty(q); return; }
+  el.innerHTML = unassignedBanner() + items.map(a => `
+    <div class="lc" onclick="openDet(${a.id})">
+      ${actBtns(a.id)}
+      <div class="lc-t">${esc(a.hotel_name)}</div>
+      ${(a.check_in_date || a.check_out_date) ? `<div class="lc-s">${[a.check_in_date, a.check_out_date].filter(Boolean).map(esc).join(' → ')}</div>` : ''}
+      ${a.no_of_nights ? `<div class="lc-s">${esc(a.no_of_nights)} nights</div>` : ''}
+      ${a.address ? `<div class="lc-n">${esc(a.address)}</div>` : ''}
+    </div>`).join('');
+}
+
+function renderPack(el, q) {
+  let items = rows;
+  if (q) items = items.filter(p => [p.notes, p.category, p.owner].join(' ').toLowerCase().includes(q));
+  if (OWNER_FILTER !== 'Show All') items = items.filter(p => (p.owner || '') === OWNER_FILTER);
+  const pillsHtml = renderOwnerPills();
+  if (!items.length) { el.innerHTML = pillsHtml + empty(q); return; }
+  const chk = p => p.is_packed
+    ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="3"/><polyline points="9 12 11 14 15 10"/></svg>`
+    : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>`;
+  const cats = [...new Set(items.map(p => p.category || 'Other'))];
+  cats.sort();
+  el.innerHTML = pillsHtml + cats.map(cat => {
+    const catItems = items.filter(p => (p.category || 'Other') === cat);
+    const catDone = catItems.filter(p => p.is_packed).length;
+    return `
+      <div style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;padding:0 2px">
+          <span style="font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)">${esc(cat)}</span>
+          <span style="font-size:11px;color:var(--muted)">${catDone}/${catItems.length}</span>
+        </div>
+        ${catItems.map(p => `
+        <div class="pi">
+          <button class="pck" onclick="togglePack(${p.id},${p.is_packed})">${chk(p)}</button>
+          <div style="flex:1;min-width:0">
+            <div class="pi-lbl${p.is_packed?' done':''}">${esc(p.notes)}</div>
+            <div class="pi-sub">${[p.owner, p.quantity?'Qty: '+p.quantity:''].filter(Boolean).map(esc).join(' · ')}</div>
+          </div>
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <button class="btn-ic" style="padding:4px 7px" onclick="openEdit(${p.id})">${SVG_EDIT}</button>
+            <button class="btn-ic" style="padding:4px 7px" onclick="delItem(${p.id})">${SVG_DEL}</button>
+          </div>
+        </div>`).join('')}
+      </div>`;
+  }).join('');
+}
+
+function renderTrans(el, q) {
+  let items = rows;
+  if (q) items = items.filter(f => [f.flight_no, f.dep_city, f.arr_city, f.dep_time].join(' ').toLowerCase().includes(q));
+  if (!items.length) { el.innerHTML = unassignedBanner() + empty(q); return; }
+  el.innerHTML = unassignedBanner() + items.map(f => `
+    <div class="lc" onclick="openDet(${f.id})">
+      ${actBtns(f.id)}
+      <div class="lc-t">${f.dep_city && f.arr_city ? `${esc(f.dep_city)} → ${esc(f.arr_city)}` : esc(f.flight_no || 'Transport')}</div>
+      <div class="lc-s">${[f.flight_no, f.dep_time].filter(Boolean).map(esc).join('  ·  ')}</div>
+      ${f.notes ? `<div class="lc-s">${esc(f.notes)}</div>` : ''}
+    </div>`).join('');
+}
+
+// ── Detail ────────────────────────────────────────────────────────────────────
+function dr(l, v) { return (v != null && v !== '') ? `<div class="dr"><span class="l">${l}</span><span class="v">${esc(String(v))}</span></div>` : ''; }
+async function loadItineraryTrips(id) {
+  itineraryTrips = await sbGetWhere('itinerary_transport', `itinerary_id=eq.${id}&order=sort_order.asc,id.asc`);
+}
+function renderTripsSection() {
+  const rowsHtml = itineraryTrips.map(t => `
+    <div style="display:grid;grid-template-columns:1.1fr 1.5fr 1.2fr auto;gap:8px;align-items:start;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:13px">${esc(t.transport_no || 'Trip')}</div>
+      <div style="font-size:13px">${esc([t.dep_city, t.arr_city].filter(Boolean).join(' → '))}</div>
+      <div style="font-size:13px">${esc([t.dep_time, t.arr_time].filter(Boolean).join(' → '))}</div>
+      <div style="display:flex;gap:4px;justify-content:flex-end">
+        <button class="btn-ic" style="padding:4px 7px" onclick="openTripEdit(${t.id})">${SVG_EDIT}</button>
+        <button class="btn-ic" style="padding:4px 7px" onclick="delTrip(${t.id})">${SVG_DEL}</button>
+      </div>
+      ${t.notes ? `<div style="grid-column:1/-1;font-size:12px;color:var(--muted);margin-top:2px">${esc(t.notes)}</div>` : ''}
+    </div>`).join('');
+  return `<div style="margin-top:18px;padding-top:8px;border-top:1px solid var(--border)">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted)">Transport</div>
+      <button class="btn-ic" style="padding:6px 10px" onclick="openTripAdd()">+ Add Trip</button>
+    </div>
+    ${itineraryTrips.length
+      ? `<div style="font-size:11px;color:var(--muted);display:grid;grid-template-columns:1.1fr 1.5fr 1.2fr auto;gap:8px;padding:4px 0 6px">
+           <div>No.</div><div>Route</div><div>Time</div><div></div>
+         </div>${rowsHtml}`
+      : `<div style="font-size:13px;color:var(--muted);padding:6px 0">No trips yet.</div>`}
+  </div>`;
+}
+
+async function openDet(id) {
+  DI = rows.find(x => x.id === id); if (!DI) return;
+  let ttl = '', sub = '', html = '';
+  if (CT === 'itinerary') {
+    try { await loadItineraryTrips(DI.id); } catch(e) { itineraryTrips = []; toast('Could not load trips'); }
+    ttl = `Day ${DI.day_number}`; sub = DI.date_label || '';
+    html = [
+      ['Place / Area', DI.place_area],
+      ['Activities', DI.activities],
+      ['Opening Hours', DI.opening_hours],
+      ['Best Time', DI.best_time],
+      ['Commute', DI.commute],
+      ['Notes', DI.notes],
+    ].map(([l,v])=>dr(l,v)).join('');
+    html += renderTripsSection();
+  } else if (CT === 'stay') {
+    ttl = DI.hotel_name || 'Stay'; sub = [DI.check_in_date, DI.check_out_date].filter(Boolean).join(' → ');
+    html = [['Check-in',DI.check_in_date],['Check-out',DI.check_out_date],['Nights',DI.no_of_nights],['Address',DI.address],['Confirmation',DI.confirmation_no],['Notes',DI.notes]].map(([l,v])=>dr(l,v)).join('');
+  } else if (CT === 'transport') {
+    ttl = DI.dep_city && DI.arr_city ? `${DI.dep_city} → ${DI.arr_city}` : DI.flight_no || 'Transport'; sub = DI.dep_time || '';
+    html = [['Travel Date',DI.travel_date],['Flight / Rail No.',DI.flight_no],['From',DI.dep_city],['To',DI.arr_city],['Departure',DI.dep_time],['Arrival',DI.arr_time],['Notes',DI.notes]].map(([l,v])=>dr(l,v)).join('');
+  } else if (CT === 'shopping_list') {
+    ttl = DI.product || 'Item'; sub = [DI.who_for, DI.where_to_buy].filter(Boolean).join(' · ');
+    const homePrice      = DI.price_home      != null ? `${DI.currency_home||'SGD'} ${Number(DI.price_home).toLocaleString()}`      : null;
+    const localPrice     = DI.price_local     != null ? `${DI.currency_local||''} ${Number(DI.price_local).toLocaleString()}`        : null;
+    const convertedPrice = DI.price_converted != null ? `${DI.currency_converted||'SGD'} ${Number(DI.price_converted).toLocaleString()}` : null;
+    const localRow = [localPrice, convertedPrice].filter(Boolean).join(' → ') || null;
+    html = [
+      ['Quantity',        DI.quantity],
+      ['Who For',         DI.who_for],
+      ['Where to Buy',    DI.where_to_buy],
+      ['Price (Home)',    homePrice],
+      ['Price (Local) → Converted', localRow],
+      ['Purchased',       DI.is_purchased ? 'Yes ✓' : 'No'],
+      ['Notes',           DI.notes],
+    ].map(([l,v])=>dr(l,v)).join('');
+    if (DI.image_url) html += `<div style="margin-top:16px"><img src="${esc(DI.image_url)}" style="width:100%;max-height:280px;object-fit:contain;border-radius:14px;background:var(--card)"/></div>`;
+  }
+  document.getElementById('dt').textContent = ttl;
+  document.getElementById('ds').textContent = sub;
+  document.getElementById('dr').innerHTML   = html;
+  document.getElementById('det').classList.add('on');
+}
+function closeDet()   { document.getElementById('det').classList.remove('on'); DI = null; itineraryTrips = []; }
+function editFromDet(){ if (DI) openEdit(DI.id); }
+
+// ── Form ──────────────────────────────────────────────────────────────────────
+const CURRENCIES = ['SGD','MYR','IDR','THB','VND','PHP','AUD','NZD','JPY','KRW','CNY','HKD','TWD','EUR','GBP','CHF','SEK','NOK','DKK','USD','CAD','MXN','BRL'];
+
+function toggleCurOther(k, val) {
+  document.getElementById('ff'+k).style.display = val === 'Other' ? 'block' : 'none';
+  if (val !== 'Other') document.getElementById('ff'+k).value = '';
+}
+
+function buildForm(item) {
+  document.getElementById('ft').textContent = (item ? 'Edit ' : 'Add ') + FORM_LABELS[CT];
+  document.getElementById('fb').innerHTML = FIELDS[CT].map(f => {
+    const v = item != null ? (item[f.k] ?? '') : '';
+    if (f.t === 'chk') {
+      const lbl = f.k === 'is_purchased' ? 'Mark as purchased' : 'Mark as packed';
+      return `<div class="ff"><label class="fck"><input type="checkbox" id="ff${f.k}" ${v?'checked':''}><span style="font-size:14px;color:var(--muted)">${lbl}</span></label></div>`;
+    }
+    if (f.t === 'sel') {
+      const isOwnerField = f.k === 'owner' && CT === 'packing_list';
+      const opts = f.o[0] === '__owners__'
+        ? ['', ...getOwners()].map(o => `<option value="${o}"${v===o?' selected':''}>${o||'Select…'}</option>`).join('')
+        : `<option value="">Select…</option>${f.o.map(o=>`<option${v===o?' selected':''}>${o}</option>`).join('')}`;
+      const selHtml = `<select class="fi" id="ff${f.k}"${isOwnerField ? ' onchange="updateEveryoneHint(this.value)"' : ''}>${opts}</select>`;
+      const hintHtml = isOwnerField ? `<div id="everyone-hint" style="font-size:12px;color:var(--muted);margin-top:4px;padding:0 2px;display:${(!item && f.o[0]==='Everyone') ? 'block' : 'none'}">📋 Creates one row per traveller — use the filter to view by person</div>` : '';
+      return `<div class="ff"><label class="fl">${f.l}</label>${selHtml}${hintHtml}</div>`;
+    }
+    if (f.t === 'price') {
+      const priceVal = item != null ? (item[f.k] ?? '') : '';
+      const curVal   = item != null ? (item[f.cur] ?? f.defcur) : f.defcur;
+      const isOther = curVal && !CURRENCIES.includes(curVal);
+      const selVal  = isOther ? 'Other' : curVal;
+      const opts    = [...CURRENCIES,'Other'].map(c=>`<option${selVal===c?' selected':''}>${c}</option>`).join('');
+      return `<div class="ff"><label class="fl">${f.l}</label>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <input class="fi" type="number" id="ff${f.k}" value="${esc(String(priceVal))}" placeholder="0.00" style="flex:1"/>
+          <select class="fi" id="ff${f.cur}_sel" style="width:90px;flex-shrink:0" onchange="toggleCurOther('${f.cur}',this.value)"><option value="">—</option>${opts}</select>
+        </div>
+        <input class="fi" id="ff${f.cur}" style="margin-top:6px;display:${isOther?'block':'none'}" placeholder="e.g. INR" value="${isOther?esc(curVal):''}"/>
+      </div>`;
+    }
+    if (f.t === 'cur') {
+      const isOther = v && !CURRENCIES.includes(v);
+      const selVal = isOther ? 'Other' : (v || '');
+      const opts = [...CURRENCIES, 'Other'].map(c => `<option${selVal===c?' selected':''}>${c}</option>`).join('');
+      return `<div class="ff"><label class="fl">${f.l}</label>
+        <select class="fi" id="ff${f.k}_sel" onchange="toggleCurOther('${f.k}',this.value)"><option value="">Select…</option>${opts}</select>
+        <input class="fi" id="ff${f.k}" style="margin-top:6px;display:${isOther?'block':'none'}" placeholder="Type currency code (e.g. INR)…" value="${isOther?esc(v):''}"/>
+      </div>`;
+    }
+    if (f.t === 'ta')  return `<div class="ff"><label class="fl">${f.l}</label><textarea class="fi" id="ff${f.k}" rows="3">${esc(v)}</textarea></div>`;
+    return `<div class="ff"><label class="fl">${f.l}</label><input class="fi" type="${f.t==='number'?'number':f.t==='date'?'date':'text'}" id="ff${f.k}" value="${esc(v)}" placeholder="Enter ${f.l.toLowerCase()}…"/></div>`;
+  }).join('') + '<div style="height:8px"></div>';
+
+  // Image upload field for shopping list
+  if (CT === 'shopping_list') {
+    const imgVal = item ? (item.image_url || '') : '';
+    document.getElementById('fb').innerHTML += `
+      <div class="ff">
+        <label class="fl">Product Image</label>
+        <div id="img-preview" style="margin-bottom:8px;display:${imgVal?'block':'none'}">
+          <img id="img-preview-src" src="${esc(imgVal)}" style="width:100%;max-height:200px;object-fit:contain;border-radius:10px;background:var(--card)"/>
+          <button onclick="clearShopImg()" style="margin-top:6px;background:none;border:none;color:var(--red);font-size:13px;cursor:pointer">✕ Remove image</button>
+        </div>
+        <input type="file" id="ff_img_file" accept="image/*" style="display:none" onchange="previewShopImg(event)"/>
+        <button class="st-add" onclick="document.getElementById('ff_img_file').click()" style="font-size:13px;padding:10px">${imgVal ? '↩ Replace Image' : '📷 Upload Image'}</button>
+        <input type="hidden" id="ff_img_url" value="${esc(imgVal)}"/>
+      </div>
+      <div style="height:8px"></div>`;
+  }
+}
+function buildTripForm(trip) {
+  const v = (k) => esc(trip ? (trip[k] ?? '') : '');
+  document.getElementById('ft').textContent = (trip ? 'Edit' : 'Add') + ' Trip';
+  document.getElementById('fb').innerHTML = `
+    <div class="ff"><label class="fl">Transport No.</label><input class="fi" id="fftrip_transport_no" value="${v('transport_no')}" placeholder="Flight / Rail / Bus no."/></div>
+    <div class="ff"><label class="fl">From</label><input class="fi" id="fftrip_dep_city" value="${v('dep_city')}" placeholder="Departure city"/></div>
+    <div class="ff"><label class="fl">To</label><input class="fi" id="fftrip_arr_city" value="${v('arr_city')}" placeholder="Arrival city"/></div>
+    <div class="ff"><label class="fl">Departure Time</label><input class="fi" id="fftrip_dep_time" value="${v('dep_time')}" placeholder="e.g. 08:15"/></div>
+    <div class="ff"><label class="fl">Arrival Time</label><input class="fi" id="fftrip_arr_time" value="${v('arr_time')}" placeholder="e.g. 10:30"/></div>
+    <div class="ff"><label class="fl">Notes</label><textarea class="fi" id="fftrip_notes" rows="3">${v('notes')}</textarea></div>
+    <div class="ff"><label class="fl">Sort Order</label><input class="fi" type="number" id="fftrip_sort_order" value="${trip?.sort_order ?? itineraryTrips.length + 1}" placeholder="1"/></div>
+    <div style="height:8px"></div>`;
+}
+
+function updateEveryoneHint(val) {
+  const hint = document.getElementById('everyone-hint');
+  if (hint) hint.style.display = val === 'Everyone' ? 'block' : 'none';
+}
+
+// ── Shopping image helpers ───────────────────────────────────────────────────
+function previewShopImg(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('img-preview-src').src = ev.target.result;
+    document.getElementById('img-preview').style.display = 'block';
+    document.getElementById('ff_img_url').value = '__pending__';
+    document.getElementById('ff_img_url').dataset.file = 'pending';
+  };
+  reader.readAsDataURL(file);
+}
+function clearShopImg() {
+  document.getElementById('img-preview').style.display = 'none';
+  document.getElementById('ff_img_url').value = '';
+  document.getElementById('ff_img_file').value = '';
+}
+async function uploadShopImage(file) {
+  const ext  = file.name.split('.').pop();
+  const path = `shopping/${Date.now()}.${ext}`;
+  const r    = await fetch(`${SB_URL}/storage/v1/object/shopping-images/${path}`, {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': file.type },
+    body: file,
+  });
+  if (!r.ok) throw new Error('Image upload failed');
+  return `${SB_URL}/storage/v1/object/public/shopping-images/${path}`;
+}
+function openAdd()    { FORM_MODE = 'main'; FI = null; buildForm(null); document.getElementById('frm').classList.add('on'); }
+function openEdit(id) { FORM_MODE = 'main'; FI = rows.find(x => x.id === id); if (!FI) return; buildForm(FI); document.getElementById('frm').classList.add('on'); }
+function openTripAdd() {
+  if (!DI) return;
+  FORM_MODE = 'trip';
+  TRIP_EDIT = null;
+  buildTripForm(null);
+  document.getElementById('frm').classList.add('on');
+}
+function openTripEdit(id) {
+  const t = itineraryTrips.find(x => x.id === id);
+  if (!t) return;
+  FORM_MODE = 'trip';
+  TRIP_EDIT = t;
+  buildTripForm(t);
+  document.getElementById('frm').classList.add('on');
+}
+function closeForm()  {
+  document.getElementById('frm').classList.remove('on');
+  FI = null;
+  TRIP_EDIT = null;
+  FORM_MODE = 'main';
+}
+function bgClose(e)   { if (e.target === document.getElementById('frm')) closeForm(); }
+
+async function submitForm() {
+  if (FORM_MODE === 'trip') { await submitTripForm(); return; }
+  const payload = {};
+  FIELDS[CT].forEach(f => {
+    if (f.t === 'price') {
+      const numEl = document.getElementById('ff' + f.k);
+      const selEl = document.getElementById('ff' + f.cur + '_sel');
+      const txtEl = document.getElementById('ff' + f.cur);
+      payload[f.k]   = numEl && numEl.value !== '' ? Number(numEl.value) : null;
+      payload[f.cur] = selEl ? (selEl.value === 'Other' ? (txtEl ? txtEl.value.trim() || null : null) : selEl.value || null) : null;
+      return;
+    }
+    if (f.t === 'cur') {
+      const sel = document.getElementById('ff' + f.k + '_sel');
+      const txt = document.getElementById('ff' + f.k);
+      if (sel) payload[f.k] = sel.value === 'Other' ? (txt ? txt.value.trim() || null : null) : (sel.value || null);
+      return;
+    }
+    const el = document.getElementById('ff' + f.k); if (!el) return;
+    payload[f.k] = f.t === 'chk'    ? el.checked
+                 : f.t === 'number' ? (el.value !== '' ? Number(el.value) : null)
+                 : el.value || null;
+  });
+  // Attach current trip to new items
+  if (!FI && CURRENT_TRIP_ID) payload.trip_id = CURRENT_TRIP_ID;
+
+  // Handle image upload for shopping list
+  if (CT === 'shopping_list') {
+    const imgUrlEl = document.getElementById('ff_img_url');
+    const imgFileEl = document.getElementById('ff_img_file');
+    if (imgUrlEl && imgUrlEl.value === '__pending__' && imgFileEl && imgFileEl.files[0]) {
+      try {
+        payload.image_url = await uploadShopImage(imgFileEl.files[0]);
+      } catch(imgErr) { toast('Image upload failed — item saved without image'); }
+    } else if (imgUrlEl) {
+      payload.image_url = imgUrlEl.value || null;
+    }
+  }
+
+  const editId = FI ? FI.id : null;
+  closeForm();
+  ss('saving');
+
+  try {
+    // ── Everyone expansion for packing list ──────────────────────────────────
+    // If adding (not editing) a packing item for "Everyone", create one row
+    // per individual traveller (owners excluding Everyone & Shared)
+    if (!editId && CT === 'packing_list' && payload.owner === 'Everyone') {
+      const allOwners = getOwners().filter(o => o !== 'Everyone' && o !== 'Shared');
+      if (allOwners.length) {
+        const inserted = [];
+        for (const owner of allOwners) {
+          const result = await sbInsert('packing_list', { ...payload, owner, is_packed: false });
+          if (result[0]) inserted.push(result[0]);
+        }
+        rows.push(...inserted);
+        localStorage.setItem(`cache_${CT}_${CURRENT_TRIP_ID}`, JSON.stringify(rows));
+        render();
+        toast(`Added for ${allOwners.join(', ')}`);
+        ss('ok');
+        return;
+      }
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
+    let updatedItem;
+    if (editId) {
+      const result = await sbUpdate(TAB_CFG[CT].table, editId, payload);
+      updatedItem = result[0];
+      toast('Saved');
+    } else {
+      const result = await sbInsert(TAB_CFG[CT].table, payload);
+      updatedItem = result[0];
+      toast('Added');
+    }
+
+    // 1. Optimistic Update: Refresh memory rows immediately
+    if (editId) {
+      rows = rows.map(r => r.id === editId ? updatedItem : r);
+    } else {
+      rows.push(updatedItem);
+    }
+
+    // 2. Refresh the UI (List and potentially Detail)
+    render();
+    if (editId && DI && DI.id === editId) {
+      openDet(editId); // Refresh the labels in the detail view
+    }
+
+    // 3. Update persistent cache
+    localStorage.setItem(`cache_${CT}_${CURRENT_TRIP_ID}`, JSON.stringify(rows));
+    ss('ok');
+
+  } catch(e) {
+    ss('error');
+    toast('Error: ' + e.message);
+    // Fallback reload if something went wrong
+    await loadTab();
+  }
+}
+async function submitTripForm() {
+  if (!DI) return;
+  const tripEditId = TRIP_EDIT ? TRIP_EDIT.id : null;
+  const payload = {
+    itinerary_id: DI.id,
+    trip_id: CURRENT_TRIP_ID || null,
+    transport_no: document.getElementById('fftrip_transport_no').value || null,
+    dep_city: document.getElementById('fftrip_dep_city').value || null,
+    arr_city: document.getElementById('fftrip_arr_city').value || null,
+    dep_time: document.getElementById('fftrip_dep_time').value || null,
+    arr_time: document.getElementById('fftrip_arr_time').value || null,
+    notes: document.getElementById('fftrip_notes').value || null,
+    sort_order: (() => {
+      const v = document.getElementById('fftrip_sort_order').value;
+      return v === '' ? 0 : Number(v);
+    })(),
+  };
+  closeForm();
+  ss('saving');
+  try {
+    if (tripEditId) {
+      await sbUpdate('itinerary_transport', tripEditId, payload);
+      toast('Trip saved');
+    } else {
+      await sbInsert('itinerary_transport', payload);
+      toast('Trip added');
+    }
+    await openDet(DI.id);
+    ss('ok');
+  } catch(e) {
+    ss('error');
+    toast('Error: ' + e.message);
+  }
+}
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+async function delItem(id) {
+  if (!confirm('Delete this item?')) return;
+  ss('saving');
+  try {
+    await sbDelete(TAB_CFG[CT].table, id);
+    if (DI && DI.id === id) closeDet();
+    await loadTab();
+    toast('Deleted');
+  } catch(e) { ss('error'); toast('Error: ' + e.message); }
+}
+async function delTrip(id) {
+  if (!confirm('Delete this trip?')) return;
+  ss('saving');
+  try {
+    await sbDelete('itinerary_transport', id);
+    toast('Trip deleted');
+    if (DI) await openDet(DI.id);
+    ss('ok');
+  } catch(e) {
+    ss('error');
+    toast('Error: ' + e.message);
+  }
+}
+
+// ── Render Shopping List ─────────────────────────────────────────────────────
+function renderShop(el, q) {
+  let items = [...rows];
+  if (q) items = items.filter(r => [r.product, r.who_for, r.where_to_buy, r.notes].join(' ').toLowerCase().includes(q));
+  if (!items.length) { el.innerHTML = unassignedBanner() + empty(q); return; }
+
+  // Group by purchased status
+  const unpurchased = items.filter(r => !r.is_purchased);
+  const purchased   = items.filter(r => r.is_purchased);
+
+  const renderGroup = (group) => group.map(r => {
+    const homePrice      = r.price_home      != null ? `${r.currency_home||'SGD'} ${Number(r.price_home).toLocaleString()}`      : null;
+    const localPrice     = r.price_local     != null ? `${r.currency_local||''} ${Number(r.price_local).toLocaleString()}`        : null;
+    const convertedPrice = r.price_converted != null ? `${r.currency_converted||'SGD'} ${Number(r.price_converted).toLocaleString()}` : null;
+    const priceLine = (homePrice || localPrice || convertedPrice)
+      ? `<div style="font-size:12px;color:var(--muted);margin-top:3px">${homePrice?'🏠 '+homePrice:''}${localPrice?' · '+localPrice:''}${convertedPrice?' → '+convertedPrice:''}</div>` : '';
+    const subLine = [r.who_for, r.where_to_buy].filter(Boolean).join(' · ');
+    return `<div class="card${r.is_purchased?' op50':''}" onclick="openDet(${r.id})">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div class="card-t" style="${r.is_purchased?'text-decoration:line-through':''}">${esc(r.product||'—')}</div>
+          ${r.quantity ? `<div style="font-size:12px;color:var(--muted)">Qty: ${esc(r.quantity)}</div>` : ''}
+          ${subLine ? `<div class="card-s">${esc(subLine)}</div>` : ''}
+          ${priceLine}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0">
+          <button class="chk${r.is_purchased?' chk-on':''}" onclick="event.stopPropagation();togglePurchased(${r.id},${r.is_purchased})">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+          <button class="btn-ic" style="padding:4px 6px;color:var(--red)" onclick="event.stopPropagation();deleteShopItem(${r.id})" title="Delete">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = unassignedBanner() +
+    (unpurchased.length ? `<div class="sec-hdr">To Buy (${unpurchased.length})</div>${renderGroup(unpurchased)}` : '') +
+    (purchased.length   ? `<div class="sec-hdr" style="margin-top:12px">Purchased (${purchased.length})</div>${renderGroup(purchased)}` : '');
+}
+
+// ── Delete shopping item ────────────────────────────────────────────────────
+async function deleteShopItem(id) {
+  if (!confirm('Delete this item?')) return;
+  rows = rows.filter(r => r.id !== id);
+  render();
+  try {
+    await sbDelete('shopping_list', id);
+    localStorage.setItem(`cache_shopping_list_${CURRENT_TRIP_ID}`, JSON.stringify(rows));
+    ss('ok');
+  } catch(e) {
+    ss('error'); toast('Error: ' + e.message); await loadTab();
+  }
+}
+
+// ── Toggle purchased ───────────────────────────────────────────────────────────
+async function togglePurchased(id, current) {
+  rows = rows.map(x => x.id === id ? { ...x, is_purchased: !current } : x);
+  render();
+  try {
+    await sbUpdate('shopping_list', id, { is_purchased: !current });
+    ss('ok');
+  } catch(e) {
+    rows = rows.map(x => x.id === id ? { ...x, is_purchased: current } : x);
+    render(); toast('Error: ' + e.message);
+  }
+}
+
+// ── Toggle packed ───────────────────────────────────────────────────────────────
+async function togglePack(id, current) {
+  rows = rows.map(x => x.id === id ? { ...x, is_packed: !current } : x);
+  render();
+  try {
+    await sbUpdate('packing_list', id, { is_packed: !current });
+    ss('ok');
+  } catch(e) {
+    rows = rows.map(x => x.id === id ? { ...x, is_packed: current } : x);
+    render(); toast('Error: ' + e.message);
+  }
+}
+
+// ── Excel import ──────────────────────────────────────────────────────────────
+function triggerImport() {
+  if (!CURRENT_TRIP_ID) { toast('Please select a trip first'); return; }
+  showImportModal(CT);
+}
+function showImportModal(tab) {
+  const isPack = tab === 'packing_list';
+  document.getElementById('im-title').textContent = isPack ? 'Import Packing List' : 'Import Itinerary Data';
+  document.getElementById('im-sub').textContent = isPack
+    ? 'Name your Excel sheet "Packing" and prepare these columns:'
+    : 'Name your Excel sheet "Itinerary" and prepare these columns:';
+  document.getElementById('im-col-list').innerHTML = isPack
+    ? `<li><span class="im-col-dot"></span><span class="im-col-name">Item</span><span class="im-col-desc">Item name (e.g. Passport, Water Bottle)</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Category</span><span class="im-col-desc">e.g. Clothing, Documents, Electronics</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Who</span><span class="im-col-desc">Owner name, Shared, or Everyone</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Quantity</span><span class="im-col-desc">e.g. 2, 1 pair (optional)</span></li>`
+    : `<li><span class="im-col-dot"></span><span class="im-col-name">Day</span><span class="im-col-desc">Day number (e.g. 1, 2, 3…)</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Date</span><span class="im-col-desc">Date label (e.g. 15 May, Mon 15 May)</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Place/Area</span><span class="im-col-desc">Location or area name</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Activities</span><span class="im-col-desc">What you plan to do</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Opening Hours</span><span class="im-col-desc">Opening hours of venues</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Best Time</span><span class="im-col-desc">Best time to visit</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Commute</span><span class="im-col-desc">How to get there</span></li>
+       <li><span class="im-col-dot"></span><span class="im-col-name">Notes</span><span class="im-col-desc">Any other notes</span></li>`;
+  document.getElementById('import-modal').classList.add('on');
+}
+function closeImportModal() {
+  document.getElementById('import-modal').classList.remove('on');
+}
+function bgCloseImportModal(e) {
+  if (e.target === document.getElementById('import-modal')) closeImportModal();
+}
+function confirmImport() {
+  closeImportModal();
+  document.getElementById('fi').click();
+}
+
+function handleImport(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async function(ev) {
+    try {
+      const wb = XLSX.read(ev.target.result, { type:'binary' });
+      let total = 0;
+      toast('Importing…');
+      for (const sn of wb.SheetNames) {
+        const sheetRows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { defval:'' });
+        if (!sheetRows.length) continue;
+        const snl = sn.toLowerCase();
+        let inserts = [];
+
+        if (snl.includes('transport') || snl.includes('flight')) {
+          inserts = sheetRows.map(r => ({
+            trip_id:   CURRENT_TRIP_ID || null,
+            flight_no: r['Flight No']||r['Ref']||r['flight_no']||'',
+            dep_city:  r['From']||r['dep_city']||'',
+            arr_city:  r['To']||r['arr_city']||'',
+            dep_time:  r['Departure']||r['Departs']||r['dep_time']||'',
+            notes:     r['Notes']||r['notes']||'',
+          }));
+          for (const row of inserts) { await sbInsert('transport', row); total++; }
+        } else if (snl.includes('pack')) {
+          inserts = sheetRows.map(r => ({
+            trip_id:   CURRENT_TRIP_ID || null,
+            notes:     r['Item']||r['item']||r['notes']||'',
+            category:  r['Category']||r['category']||'',
+            owner:     r['Who']||r['Owner']||r['owner']||'',
+            quantity:  r['Quantity']||r['qty']||'',
+            is_packed: false,
+          }));
+          for (const row of inserts) { await sbInsert('packing_list', row); total++; }
+        } else if (snl.includes('stay') || snl.includes('hotel') || snl.includes('address')) {
+          inserts = sheetRows.map(r => ({
+            trip_id:         CURRENT_TRIP_ID || null,
+            hotel_name:      r['Destination']||r['Hotel']||r['Name']||r['hotel_name']||'',
+            check_in_date:   r['Check-in']||r['Check In']||r['check_in_date']||'',
+            check_out_date:  r['Check-out']||r['Check Out']||r['check_out_date']||'',
+            address:         r['Chinese Address (Show this to Driver)']||r['Address']||r['address']||'',
+            confirmation_no: r['Ref']||r['Confirmation']||r['confirmation_no']||'',
+            notes:           r['Notes']||r['notes']||'',
+          }));
+          for (const row of inserts) { await sbInsert('stay', row); total++; }
+        } else {
+          // Check existing itinerary rows for this trip to avoid duplicates
+          let existingDays = new Set();
+          try {
+            const existing = await sbGetWhere('itinerary', `trip_id=eq.${CURRENT_TRIP_ID}&select=day_number`);
+            existing.forEach(r => existingDays.add(r.day_number));
+          } catch(_) {}
+          inserts = sheetRows.map(r => ({
+            trip_id:       CURRENT_TRIP_ID || null,
+            day_number:    parseInt(String(r['Day']||r['day_number']||'').replace(/\D/g,''))||null,
+            date_label:    r['Date']||r['date_label']||'',
+            place_area:    r['Place/Area']||r['Place']||r['place_area']||'',
+            activities:    r['Activities']||r['activities']||'',
+            opening_hours: r['Opening Hours']||r['opening_hours']||'',
+            best_time:     r['Best Time']||r['best_time']||'',
+            commute:       r['Commute']||r['commute']||'',
+            notes:         r['Notes']||r['notes']||'',
+          })).filter(r => r.day_number && !existingDays.has(r.day_number));
+          for (const row of inserts) { await sbInsert('itinerary', row); total++ ; }
+        }
+      }
+      await loadTab();
+      toast(`Imported ${total} row${total !== 1 ? 's' : ''}`);
+    } catch(err) { ss('error'); toast('Import error: ' + err.message); }
+  };
+  reader.readAsBinaryString(file);
+  e.target.value = '';
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function toast(m) {
+  const t = document.getElementById('toast');
+  t.textContent = m; t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 2500);
+}
+
+// ── Trip Selector ─────────────────────────────────────────────────────────────
+async function openTripSelector() {
+  document.getElementById('trip-sel').classList.add('on');
+  const listEl = document.getElementById('ts-list');
+  listEl.innerHTML = `<div class="st"><p style="font-size:14px;color:var(--muted)">Loading trips…</p></div>`;
+  try {
+    allTrips = await sbGetTrips();
+    renderTripList();
+  } catch(e) {
+    listEl.innerHTML = `<div class="st"><p style="font-size:14px;color:var(--red)">Could not load trips</p></div>`;
+  }
+}
+
+// ── Per-trip unlock state ────────────────────────────────────────────────────
+function getUnlockedTrips() {
+  try { return JSON.parse(localStorage.getItem('unlockedTrips') || '{}'); } catch(e) { return {}; }
+}
+function isTripUnlocked(id) { return !!getUnlockedTrips()[id]; }
+function setTripUnlocked(id) {
+  const map = getUnlockedTrips();
+  map[id] = true;
+  localStorage.setItem('unlockedTrips', JSON.stringify(map));
+}
+
+let PENDING_UNLOCK_ID = null;
+
+function renderTripList() {
+  const listEl = document.getElementById('ts-list');
+  document.getElementById('ts-unlock-row').style.display = 'none';
+
+  if (!allTrips.length) {
+    listEl.innerHTML = `<div class="st" style="padding-top:20px"><p>No trips yet. Create one to get started.</p></div>`;
+    return;
+  }
+
+  // Show all trips — locked ones show a lock icon and prompt for passcode on tap
+  listEl.innerHTML = allTrips.map((t, i) => {
+    const isLocked  = t.passcode && !isTripUnlocked(t.id);
+    const isActive  = t.id === CURRENT_TRIP_ID;
+    const dates     = [t.start_date, t.end_date].filter(Boolean).join(' → ');
+    const lockIcon  = isLocked
+      ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--pill)" stroke-width="2.2" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`
+      : '';
+    const statusBadge = t.status === 'archived'
+      ? `<span class="ts-card-badge" style="background:#888">Archived</span>`
+      : (isActive ? `<span class="ts-card-badge">Selected</span>` : '');
+    const clickFn = isLocked ? `promptTripUnlock(${i})` : `selectTripByIndex(${i})`;
+    return `
+    <div class="ts-card${isActive?' active-trip':''}" onclick="${clickFn}">
+      <div class="ts-card-ico">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${isLocked?'#aaa':'var(--pill)'}" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div class="ts-card-body" style="${isLocked?'opacity:.5':''}">
+        <div class="ts-card-name" style="display:flex;align-items:center;gap:5px">${lockIcon}${esc(t.name)}</div>
+        ${dates ? `<div class="ts-card-dates">${esc(dates)}</div>` : ''}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        ${statusBadge}
+        <button class="btn-ic" style="padding:5px 8px;flex-shrink:0" onclick="event.stopPropagation();openEditTripByIndex(${i})" title="Edit trip">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-ic" style="padding:5px 8px;flex-shrink:0;color:var(--red)" onclick="event.stopPropagation();deleteTripByIndex(${i})" title="Delete trip">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function promptTripUnlock(i) {
+  const t = allTrips[i]; if (!t) return;
+  PENDING_UNLOCK_ID = t.id;
+  document.getElementById('passcode-entry').value = '';
+  document.getElementById('passcode-error').style.display = 'none';
+  document.getElementById('passcode-modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('passcode-entry').focus(), 100);
+}
+function closePasscodeModal() {
+  document.getElementById('passcode-modal').style.display = 'none';
+  PENDING_UNLOCK_ID = null;
+}
+function bgClosePasscodeModal(e) {
+  if (e.target === document.getElementById('passcode-modal')) closePasscodeModal();
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.getElementById('passcode-modal') && document.getElementById('passcode-modal').style.display === 'flex') submitPasscode();
+});
+function submitPasscode() {
+  if (!PENDING_UNLOCK_ID) return;
+  const trip    = allTrips.find(t => t.id === PENDING_UNLOCK_ID);
+  const entered = document.getElementById('passcode-entry').value;
+  if (trip && entered === trip.passcode) {
+    setTripUnlocked(PENDING_UNLOCK_ID);
+    closePasscodeModal();
+    toast('Trip unlocked');
+    renderTripList();
+    // Auto-select the trip after unlocking
+    selectTrip(trip.id, trip.name);
+  } else {
+    document.getElementById('passcode-error').style.display = 'block';
+    document.getElementById('passcode-entry').value = '';
+    document.getElementById('passcode-entry').focus();
+  }
+}
+
+function selectTripByIndex(i) {
+  const t = allTrips[i]; if (!t) return;
+  selectTrip(t.id, t.name);
+}
+function openEditTripByIndex(i) {
+  const t = allTrips[i]; if (!t) return;
+  openEditTrip(t.id);
+}
+async function deleteTripByIndex(i) {
+  const t = allTrips[i]; if (!t) return;
+  if (!confirm('Delete "' + t.name + '"? Itinerary and packing data will not be deleted.')) return;
+  ss('saving');
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/trips?id=eq.' + t.id, { method: 'DELETE', headers: H });
+    if (!r.ok) throw new Error(await r.text());
+    allTrips = allTrips.filter(x => x.id !== t.id);
+    if (CURRENT_TRIP_ID === t.id) {
+      CURRENT_TRIP_ID = null;
+      localStorage.removeItem('currentTripId');
+      document.getElementById('trip-pill-btn').style.display = 'none';
+    }
+    toast('Trip deleted');
+    ss('ok');
+    renderTripList();
+  } catch(e) { ss('error'); toast('Error: ' + e.message); }
+}
+
+function selectTrip(id, name) {
+  CURRENT_TRIP_ID = id;
+  localStorage.setItem('currentTripId', id);
+  document.getElementById('trip-sel').classList.remove('on');
+  document.getElementById('trip-pill-btn').style.display = 'inline-flex';
+  document.getElementById('trip-pill-name').textContent = name;
+  loadTab();
+}
+
+function closeTripSelector() {
+  // Only allow closing if a trip is already selected
+  if (CURRENT_TRIP_ID) document.getElementById('trip-sel').classList.remove('on');
+}
+
+// Trip Add/Edit form
+let TRIP_META_EDIT = null;
+function openAddTrip() {
+  TRIP_META_EDIT = null;
+  document.getElementById('tft').textContent = 'New Trip';
+  document.getElementById('tfb').innerHTML = buildTripMetaForm(null);
+  document.getElementById('trip-fft').innerHTML = '<button class="fsave" onclick="submitTripMeta(true)">Save</button>';
+  document.getElementById('trip-frm').style.display = 'flex';
+}
+function openEditTrip(id) {
+  TRIP_META_EDIT = allTrips.find(t => t.id === id);
+  if (!TRIP_META_EDIT) return;
+  document.getElementById('tft').textContent = 'Trip Settings';
+  document.getElementById('tfb').innerHTML = buildTripMetaForm(TRIP_META_EDIT);
+  document.getElementById('trip-fft').innerHTML =
+    '<button onclick="openTripDirect()" style="flex:1;padding:13px;background:var(--card);color:var(--text);border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-right:8px">Open Trip</button>' +
+    '<button class="fsave" onclick="submitTripMeta(true)">Save & Open</button>';
+  document.getElementById('trip-frm').style.display = 'flex';
+}
+function openTripDirect() {
+  const t = TRIP_META_EDIT; if (!t) return;
+  closeTripFrm();
+  selectTrip(t.id, t.name);
+}
+function buildTripMetaForm(t) {
+  const v = k => esc(t ? (t[k] ?? '') : '');
+  const hasPasscode = t && t.passcode;
+  return `
+    <div class="ff"><label class="fl">Trip Name</label><input class="fi" id="tfname" value="${v('name')}" placeholder="e.g. Japan 2025"/></div>
+    <div class="ff"><label class="fl">Start Date</label><input class="fi" type="date" id="tfstart" value="${v('start_date')}"/></div>
+    <div class="ff"><label class="fl">End Date</label><input class="fi" type="date" id="tfend" value="${v('end_date')}"/></div>
+    <div class="ff"><label class="fl">Status</label><select class="fi" id="tfstatus"><option value="active"${(!t||t.status==='active')?' selected':''}>Active</option><option value="archived"${t&&t.status==='archived'?' selected':''}>Archived</option></select></div>
+    <div class="ff">
+      <label class="fl">🔒 Trip Passcode</label>
+      <input class="fi" type="password" id="tfpasscode" value="${v('passcode')}" placeholder="Set a passcode to make this trip private…" autocomplete="new-password"/>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">Leave blank to keep this trip visible to everyone.</div>
+    </div>
+    <div style="height:8px"></div>`;
+}
+function closeTripFrm() { document.getElementById('trip-frm').style.display = 'none'; TRIP_META_EDIT = null; }
+function bgCloseTripFrm(e) { if (e.target === document.getElementById('trip-frm')) closeTripFrm(); }
+async function submitTripMeta(andOpen = false) {
+  const name = document.getElementById('tfname').value.trim();
+  if (!name) { toast('Trip name is required'); return; }
+  const passcode = document.getElementById('tfpasscode').value.trim();
+  const payload = {
+    name,
+    start_date: document.getElementById('tfstart').value || null,
+    end_date:   document.getElementById('tfend').value || null,
+    status:     document.getElementById('tfstatus').value,
+    passcode:   passcode || null,
+    is_private: !!passcode,
+  };
+  // Capture edit target BEFORE closing the form (closeTripFrm nulls TRIP_META_EDIT)
+  const editTarget = TRIP_META_EDIT;
+  closeTripFrm();
+  ss('saving');
+  try {
+    if (editTarget) {
+      await sbUpdate('trips', editTarget.id, payload);
+      toast('Trip updated');
+      if (editTarget.id === CURRENT_TRIP_ID) {
+        document.getElementById('trip-pill-name').textContent = payload.name;
+      }
+      if (andOpen) { selectTrip(editTarget.id, payload.name); return; }
+    } else {
+      const res = await sbInsert('trips', payload);
+      const newTrip = res[0];
+      toast('Trip created');
+      selectTrip(newTrip.id, newTrip.name);
+      return;
+    }
+    allTrips = await sbGetTrips();
+    renderTripList();
+    ss('ok');
+  } catch(e) { ss('error'); toast('Error: ' + e.message); }
+}
+
+// ── Settings ─────────────────────────────────────────────────────────────────
+const DEFAULT_CATS   = ['Clothing','Toiletries','Skincare','Documents','Electronics','Medical','Carryon Essentials','Personal Essentials','To Do','Others'];
+const DEFAULT_OWNERS = ['Everyone','Traveller 1','Traveller 2','Traveller 3','Shared'];
+
+function getSettings() {
+  try { return JSON.parse(localStorage.getItem('travelSettings') || '{}'); } catch(e) { return {}; }
+}
+function saveSettingsData(s) {
+  localStorage.setItem('travelSettings', JSON.stringify(s));
+}
+function getCategories() { return getSettings().categories || DEFAULT_CATS; }
+function getOwners() { return getSettings().owners || DEFAULT_OWNERS; }
+
+function applySettings() {
+  FIELDS.packing_list[1].o = getCategories();
+  FIELDS.packing_list[2].o = getOwners();
+}
+
+function openSettings() {
+  const s = getSettings();
+  const cats   = s.categories || [...DEFAULT_CATS];
+  const owners = s.owners     || [...DEFAULT_OWNERS];
+
+  document.getElementById('stb').innerHTML = `
+    <div class="st-sec">
+      <span class="st-sec-t">Who labels</span>
+      <div id="own-list">
+        ${owners.map((o,i) => `
+          <div class="st-row">
+            <input type="text" id="own${i}" value="${esc(o)}" placeholder="Name…"/>
+            ${i > 2 ? `<button class="st-del" onclick="removeOwner(${i})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+          </div>`).join('')}
+      </div>
+      <button class="st-add" onclick="addOwner()">+ Add person</button>
+    </div>
+    <div class="st-sec">
+      <span class="st-sec-t">Categories</span>
+      <div id="cat-list">
+        ${cats.map((c,i) => `
+          <div class="st-row">
+            <input type="text" id="cat${i}" value="${esc(c)}" placeholder="Category…"/>
+            <button class="st-del" onclick="removeCat(${i})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>`).join('')}
+      </div>
+      <button class="st-add" onclick="addCat()">+ Add category</button>
+    </div>`;
+  document.getElementById('stt').classList.add('on');
+}
+
+function addOwner() {
+  const list = document.getElementById('own-list');
+  const i = list.children.length;
+  const div = document.createElement('div');
+  div.className = 'st-row';
+  div.innerHTML = `<input type="text" id="own${i}" value="" placeholder="Name…"/><button class="st-del" onclick="this.parentElement.remove()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+  list.appendChild(div);
+}
+function removeOwner(i) {
+  const el = document.getElementById('own' + i);
+  if (el) el.closest('.st-row').remove();
+}
+function addCat() {
+  const list = document.getElementById('cat-list');
+  const i = list.children.length;
+  const div = document.createElement('div');
+  div.className = 'st-row';
+  div.innerHTML = `<input type="text" id="cat${i}" value="" placeholder="Category…"/><button class="st-del" onclick="this.parentElement.remove()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+  list.appendChild(div);
+}
+function removeCat(i) {
+  const el = document.getElementById('cat' + i);
+  if (el) el.closest('.st-row').remove();
+}
+
+
+function resetSettings() {
+  if (!confirm('Reset owners and categories to defaults?')) return;
+  localStorage.removeItem('travelSettings');
+  applySettings();
+  openSettings();
+  toast('Settings reset to defaults');
+  if (CT === 'packing_list') render();
+}
+function saveSettings() {
+  const owners = [...document.getElementById('own-list').querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);
+  const cats   = [...document.getElementById('cat-list').querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean);
+  saveSettingsData({ owners, categories: cats });
+  applySettings();
+  closeSettings();
+  toast('Settings saved');
+  if (CT === 'packing_list') render();
+}
+function closeSettings()         { document.getElementById('stt').classList.remove('on'); }
+function bgCloseSettings(e)      { if (e.target === document.getElementById('stt')) closeSettings(); }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.getElementById('unlock-btn').addEventListener('click', function() { promptUnlock(); });
+applySettings();
+// settings button always visible via CSS
+
+// If we have a stored trip, show the pill and load data; otherwise open selector
+if (CURRENT_TRIP_ID) {
+  // Attempt to resolve trip name from Supabase (async); show pill immediately
+  document.getElementById('trip-pill-btn').style.display = 'inline-flex';
+  sbGetTrips().then(trips => {
+    allTrips = trips;
+    const trip = trips.find(t => t.id === CURRENT_TRIP_ID);
+    document.getElementById('trip-pill-name').textContent = trip ? trip.name : 'Trip';
+  }).catch(() => {});
+  loadTab();
+} else {
+  openTripSelector();
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .then(reg => console.log('SW registered', reg.scope))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+</script>
+</body>
+</html>
